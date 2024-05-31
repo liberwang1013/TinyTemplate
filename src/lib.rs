@@ -226,6 +226,24 @@ impl<'template> TinyTemplate<'template> {
             }),
         }
     }
+
+    pub fn render_all<C>(&self, context: &C) -> Result<HashMap<String, String>>
+    where
+        C: Serialize,
+    {
+        let value = serde_json::to_value(context)?;
+        let mut output: HashMap<_, _> = HashMap::new();
+        for (k, tmpl) in &self.templates {
+            let renderd = tmpl.render(
+                &value,
+                &self.templates,
+                &self.formatters,
+                self.default_formatter,
+            )?;
+            output.insert(k.to_string(), renderd);
+        }
+        Ok(output)
+    }
 }
 impl<'template> Default for TinyTemplate<'template> {
     fn default() -> TinyTemplate<'template> {
