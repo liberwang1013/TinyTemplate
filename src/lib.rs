@@ -244,6 +244,16 @@ impl<'template> TinyTemplate<'template> {
         }
         Ok(output)
     }
+
+    pub fn get_values(&self, template: &str) -> Result<Vec<String>> {
+        match self.templates.get(template) {
+            Some(tmpl) => tmpl.get_values(),
+            None => Err(Error::GenericError {
+                msg: format!("Unknown template '{}'", template),
+            }),
+        }
+        //Ok(())
+    }
 }
 impl<'template> Default for TinyTemplate<'template> {
     fn default() -> TinyTemplate<'template> {

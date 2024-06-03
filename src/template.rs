@@ -10,6 +10,8 @@ use std::fmt::Write;
 use std::slice;
 use ValueFormatter;
 
+use crate::instruction::path_to_str;
+
 /// Enum defining the different kinds of records on the context stack.
 enum ContextElement<'render, 'template> {
     /// Object contexts shadow everything below them on the stack, because every name is looked up
@@ -144,6 +146,19 @@ impl<'template> Template<'template> {
             &mut output,
         )?;
         Ok(output)
+    }
+
+    pub fn get_values(&self) -> Result<Vec<String>> {
+        let mut values: Vec<String> = vec![];
+        let mut program_counter = 0;
+        while program_counter < self.instructions.len() {
+            if let Instruction::Value(path) = &self.instructions[program_counter] {
+                let p = path_to_str(path);
+                values.push(p)
+            }
+            program_counter += 1;
+        }
+        Ok(values)
     }
 
     /// Render this template into a given string. Used for calling other templates.
